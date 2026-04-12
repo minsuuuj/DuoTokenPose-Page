@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting</title>
+    <style>
+        body { font-family: 'Inter', -apple-system, sans-serif; line-height: 1.6; color: #333; max-width: 1000px; margin: 0 auto; padding: 40px 20px; background-color: #fafafa; }
+        .header { text-align: center; margin-bottom: 50px; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; color: #1a1a1a; }
+        .authors { font-size: 1.2em; margin-bottom: 20px; color: #555; }
+        .affiliation { font-style: italic; margin-bottom: 30px; }
+        .links { margin-bottom: 40px; }
+        .links a { display: inline-block; padding: 10px 20px; margin: 5px; background: #333; color: #fff; text-decoration: none; border-radius: 5px; transition: 0.3s; }
+        .links a:hover { background: #555; }
+        .section { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; color: #000; }
+        .figure { text-align: center; margin: 30px 0; }
+        .figure img { max-width: 100%; border-radius: 8px; }
+        .caption { font-size: 0.9em; color: #666; margin-top: 10px; text-align: justify; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+        th { background: #f8f8f8; }
+        .highlight { font-weight: bold; color: #007bff; }
+        pre { background: #f4f4f4; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting</h1>
+    <div class="authors">Minsu Jeon, Janghyun Kim, Jinsun Park</div>
+    <div class="affiliation">Eurographics 2026 (Short Paper)</div>
+    
+    <div class="links">
+        <a href="#">[Paper PDF]</a>
+        <a href="#">[Code (GitHub)]</a>
+        <a href="#">[Poster]</a>
+        <a href="#">[BibTeX]</a>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Abstract</h2>
+    <p>
+    3D human pose estimation from monocular images is inherently challenging due to frequent occlusions, which introduce significant ambiguity in joint visibility. For instance, regression-based methods are highly sensitive to these ambiguities, often leading to unstable and jittery pose estimates.
+    To overcome these limitations, recent token-based methods discretize poses into structured representations and better capture joint dependencies. However, most existing approaches operate in a frame-wise manner, neglecting temporal continuity and consequently suffering from time-inconsistent predictions.
+    Therefore, we propose a spatio-temporal token-based framework for 3D human pose estimation that explicitly models both spatial and temporal dependencies. In specific, a Spatio-Temporal Tokenizer decomposes 3D pose sequences into discrete spatial and temporal tokens via a dual codebook design.
+    To predict these tokens from 2D pose sequences, we further develop a token classifier based on a SemGCN–GraphGRU architecture, enabling effective temporal reasoning while preserving skeletal structure.
+    Extensive experiments on the Human3.6M dataset demonstrate that our method achieves state-of-the-art performance among short-sequence methods, while significantly reducing high-frequency jitter and producing smooth, physically plausible 3D pose sequences.
+    </p>
+</div>
+
+<div class="section">
+    <h2>Methodology</h2>
+    <p>제안된 프레임워크는 크게 두 단계로 구성됩니다[cite: 65, 71]:</p>
+    <ul>
+        <li><strong>Stage 1 (Spatio-Temporal Tokenizer):</strong> 3D 포즈 시퀀스를 이산적인 공간 및 시간 토큰으로 압축하고 복원하는 듀얼 브랜치 VQ-VAE를 학습합니다[cite: 66, 72].</li>
+        <li><strong>Stage 2 (Token Classifier):</strong> SemGCN과 GraphGRU를 결합하여 2D 포즈 시퀀스로부터 최적의 토큰 인덱스를 예측하는 분류기를 학습합니다[cite: 68, 73].</li>
+    </ul>
+    <div class="figure">
+        <img src="figures/pipeline.png" alt="Framework Overview">
+        <p class="caption"><strong>Figure 1:</strong> 전체적인 시공간 토큰화 프레임워크 개요. 1단계에서 학습된 코드북과 디코더는 2단계 학습 시 고정(freeze)되어 유효한 구조적 사전 지식을 유지합니다[cite: 65, 69].</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Quantitative Results</h2>
+    <p>Human3.6M 데이터셋에서 CPN으로 검출된 2D 포즈를 입력으로 사용하여 성능을 평가하였습니다[cite: 128, 140].</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Methods (f: frames)</th>
+                <th>MPJPE (mm) ↓</th>
+                <th>P-MPJPE (mm) ↓</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>PCT [GWW 23] (Single Frame)</td>
+                <td>50.8</td>
+                <td>41.9</td>
+            </tr>
+            <tr>
+                <td>Cai et al. [CFS 21] (f=7)</td>
+                <td>45.6</td>
+                <td>35.5</td>
+            </tr>
+            <tr class="highlight">
+                <td>Ours (f=20)</td>
+                <td>45.5</td>
+                <td>36.6</td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="caption"></p>
+</div>
+
+<div class="section">
+    <h2>Temporal Stability Analysis</h2>
+    <div class="figure">
+        <img src="figures/stability.png" alt="Jitter Analysis">
+        <p class="caption"><strong>Figure 2:</strong> 머리 관절의 속도(Velocity) 및 가속도(Acceleration) 프로필 비교. 베이스라인과 달리 우리 모델은 Ground Truth를 긴밀하게 추적하며 고주파 노이즈(지터)를 효과적으로 억제합니다[cite: 148, 149].</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2>BibTeX</h2>
+    <pre>
+@inproceedings{jeon2026token,
+  title={Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting},
+  author={Jeon, Minsu and Lim, L. and Musialski, P.},
+  booktitle={Proceedings of Eurographics (Short Papers)},
+  year={2026}
+}</pre>
+</div>
+
+</body>
+</html>
