@@ -11,8 +11,8 @@
         .authors { font-size: 1.2em; margin-bottom: 20px; color: #555; }
         .affiliation { font-style: italic; margin-bottom: 30px; }
         .links { margin-bottom: 40px; }
-        .links a { display: inline-block; padding: 10px 20px; margin: 5px; background: #333; color: #fff; text-decoration: none; border-radius: 5px; transition: 0.3s; }
-        .links a:hover { background: #555; }
+        .links a, .links button { display: inline-block; padding: 10px 20px; margin: 5px; background: #333; color: #fff; text-decoration: none; border: none; border-radius: 5px; transition: 0.3s; cursor: pointer; }
+        .links a:hover, .links button:hover { background: #555; }
         .section { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
         h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; color: #000; }
         .figure { text-align: center; margin: 30px 0; }
@@ -23,6 +23,12 @@
         th { background: #f8f8f8; }
         .highlight { font-weight: bold; color: #007bff; }
         pre { background: #f4f4f4; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 0.9em; }
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 8px; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+        .copy-btn { background: #333; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .copy-btn:hover { background: #555; }
     </style>
 </head>
 <body>
@@ -33,9 +39,8 @@
     <div class="affiliation">Eurographics 2026 (Short Paper)</div>
     
     <div class="links">
-        <a href="#">[Paper PDF]</a>
-        <a href="#">[Poster]</a>
-        <a href="#">[BibTeX]</a>
+        <a href="https://drive.google.com/file/d/1slPjf4jPACQpqwc94qhPt-wy_vY4cIcm/view?usp=sharing">[Paper PDF]</a>
+        <button onclick="openModal()">[BibTeX]</button>
     </div>
 </div>
 
@@ -52,11 +57,147 @@
 
 <div class="section">
     <h2>Hyperparameter</h2>
-    <p></p>
-    <ul>
-        <li><strong>Stage 1 (Spatio-Temporal Tokenizer):</strong> 3D 포즈 시퀀스를 이산적인 공간 및 시간 토큰으로 압축하고 복원하는 듀얼 브랜치 VQ-VAE를 학습합니다[cite: 66, 72].</li>
-        <li><strong>Stage 2 (Token Classifier):</strong> SemGCN과 GraphGRU를 결합하여 2D 포즈 시퀀스로부터 최적의 토큰 인덱스를 예측하는 분류기를 학습합니다[cite: 68, 73].</li>
-    </ul>
+    <div>
+        <h3>Tokenizer Encoder</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>num_blocks</strong></td>
+                    <td>4</td>
+                    <td>Number of blocks in the encoder</td>
+                </tr>
+                <tr>
+                    <td><strong>hidden_dim</strong></td>
+                    <td>512</td>
+                    <td>Hidden dimension</td>
+                </tr>
+                <tr>
+                    <td><strong>token_inter_dim</strong></td>
+                    <td>64</td>
+                    <td>Token intermediate dimension</td>
+                </tr>
+                <tr>
+                    <td><strong>hidden_inter_dim</strong></td>
+                    <td>512</td>
+                    <td>Hidden intermediate dimension</td>
+                </tr>
+                <tr>
+                    <td><strong>drop_rate</strong></td>
+                    <td>0.2</td>
+                    <td>Encoder dropout rate</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h3>Tokenizer Decoder</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>num_blocks</strong></td>
+                    <td>1</td>
+                    <td>Number of blocks in the decoder</td>
+                </tr>
+                <tr>
+                    <td><strong>hidden_dim</strong></td>
+                    <td>32</td>
+                    <td>Hidden dimension</td>
+                </tr>
+                <tr>
+                    <td><strong>token_inter_dim</strong></td>
+                    <td>64</td>
+                    <td>Token intermediate dimension</td>
+                </tr>
+                <tr>
+                    <td><strong>hidden_inter_dim</strong></td>
+                    <td>64</td>
+                    <td>Hidden intermediate dimension</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h3>Codebook / VQ (Codebook Settings)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>token_num</strong></td>
+                    <td>34</td>
+                    <td>Number of tokens used</td>
+                </tr>
+                <tr>
+                    <td><strong>token_dim</strong></td>
+                    <td>512</td>
+                    <td>Embedding dimension of each token</td>
+                </tr>
+                <tr>
+                    <td><strong>s_token_class_num</strong></td>
+                    <td>1024</td>
+                    <td>Number of spatial token classes (Codebook Size)</td>
+                </tr>
+                <tr>
+                    <td><strong>t_token_class_num</strong></td>
+                    <td>1024</td>
+                    <td>Number of temporal token classes (Codebook Size)</td>
+                </tr>
+                <tr>
+                    <td><strong>ema_decay</strong></td>
+                    <td>0.9</td>
+                    <td>EMA (Exponential Moving Average) coefficient for codebook update</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h3>Loss Function</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>joint_loss_w</strong></td>
+                    <td>1.0</td>
+                    <td>Joint reconstruction loss weight</td>
+                </tr>
+                <tr>
+                    <td><strong>e_loss_w</strong></td>
+                    <td>5.0</td>
+                    <td>Embedding loss (Commitment Loss) weight</td>
+                </tr>
+                <tr>
+                    <td><strong>beta</strong></td>
+                    <td>0.05</td>
+                    <td>Threshold for Smooth L1 Loss</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <div class="figure">
         <img src="figures/pipeline.png" alt="Framework Overview">
         <p class="caption"><strong>Figure 1:</strong> 전체적인 시공간 토큰화 프레임워크 개요. 1단계에서 학습된 코드북과 디코더는 2단계 학습 시 고정(freeze)되어 유효한 구조적 사전 지식을 유지합니다[cite: 65, 69].</p>
@@ -102,6 +243,22 @@
     </div>
 </div>
 
+<div id="bibtexModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>BibTeX</h2>
+        <pre id="bibtexContent">
+@inproceedings{jeon2026token,
+  title={Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting},
+  author={Jeon, Minsu and Lim, L. and Musialski, P.},
+  booktitle={Proceedings of Eurographics (Short Papers)},
+  year={2026}
+}
+        </pre>
+        <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+</div>
+
 <div class="section">
     <h2>BibTeX</h2>
     <pre>
@@ -112,6 +269,33 @@
   year={2026}
 }</pre>
 </div>
+
+<script>
+function openModal() {
+    document.getElementById('bibtexModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('bibtexModal').style.display = 'none';
+}
+
+function copyToClipboard() {
+    const bibtexText = document.getElementById('bibtexContent').textContent;
+    navigator.clipboard.writeText(bibtexText).then(function() {
+        alert('BibTeX copied to clipboard!');
+    }, function(err) {
+        console.error('Could not copy text: ', err);
+    });
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('bibtexModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
 
 </body>
 </html>
