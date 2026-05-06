@@ -116,7 +116,11 @@
 <div class="section">
     <h2>Abstract</h2>
     <p>
-        3D human pose estimation from monocular images is inherently challenging due to frequent occlusions... (중략) ...Extensive experiments on the Human3.6M dataset demonstrate that our method achieves state-of-the-art performance among short-sequence methods.
+    3D human pose estimation from monocular images is inherently challenging due to frequent occlusions, which introduce significant ambiguity in joint visibility. For instance, regression-based methods are highly sensitive to these ambiguities, often leading to unstable and jittery pose estimates.
+    To overcome these limitations, recent token-based methods discretize poses into structured representations and better capture joint dependencies. However, most existing approaches operate in a frame-wise manner, neglecting temporal continuity and consequently suffering from time-inconsistent predictions.
+    Therefore, we propose a spatio-temporal token-based framework for 3D human pose estimation that explicitly models both spatial and temporal dependencies. In specific, a Spatio-Temporal Tokenizer decomposes 3D pose sequences into discrete spatial and temporal tokens via a dual codebook design.
+    To predict these tokens from 2D pose sequences, we further develop a token classifier based on a SemGCN–GraphGRU architecture, enabling effective temporal reasoning while preserving skeletal structure.
+    Extensive experiments on the Human3.6M dataset demonstrate that our method achieves state-of-the-art performance among short-sequence methods, while significantly reducing high-frequency jitter and producing smooth, physically plausible 3D pose sequences.
     </p>
 </div>
 
@@ -172,7 +176,7 @@
     <h2>BibTeX</h2>
     <pre id="bibtexDisplay">@inproceedings{jeon2026token,
   title={Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting},
-  author={Jeon, Minsu and Lim, L. and Musialski, P.},
+  author={Minsu, Jeon and Janghyun, Kim and Jinsun, Park},
   booktitle={Proceedings of Eurographics (Short Papers)},
   year={2026}
 }</pre>
@@ -185,7 +189,7 @@
         <h2>BibTeX Citation</h2>
         <pre id="bibtexContent">@inproceedings{jeon2026token,
   title={Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting},
-  author={Jeon, Minsu and Lim, L. and Musialski, P.},
+  author={Minsu, Jeon and Janhyun, Kim and Jinsun, Park },
   booktitle={Proceedings of Eurographics (Short Papers)},
   year={2026}
 }</pre>
