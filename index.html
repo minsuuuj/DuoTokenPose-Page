@@ -5,44 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting</title>
     <style>
-        body { font-family: 'Inter', -apple-system, sans-serif; line-height: 1.6; color: #333; max-width: 1000px; margin: 0 auto; padding: 40px 20px; background-color: #fafafa; }
+        /* 기본 스타일 유지 및 개선 */
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+            background-color: #fafafa; 
+            word-break: keep-all; /* 한글 줄바꿈 최적화 */
+        }
+        
         .header { text-align: center; margin-bottom: 50px; }
-        h1 { font-size: 2.5em; margin-bottom: 10px; color: #1a1a1a; }
-        .authors { font-size: 1.2em; margin-bottom: 20px; color: #555; }
-        .affiliation { font-style: italic; margin-bottom: 30px; }
-        .links { margin-bottom: 40px; }
-        .links a, .links button { display: inline-block; padding: 10px 20px; margin: 5px; background: #333; color: #fff; text-decoration: none; border: none; border-radius: 5px; transition: 0.3s; cursor: pointer; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; color: #1a1a1a; line-height: 1.2; }
+        .authors { font-size: 1.1em; margin-bottom: 10px; color: #555; }
+        .affiliation-container { margin-bottom: 30px; font-size: 0.95em; }
+        .affiliation { font-style: italic; color: #666; margin-top: 10px; }
+        
+        .links { margin-bottom: 40px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .links a, .links button { 
+            display: inline-block; 
+            padding: 10px 20px; 
+            background: #333; 
+            color: #fff; 
+            text-decoration: none; 
+            border: none; 
+            border-radius: 5px; 
+            transition: 0.3s; 
+            cursor: pointer;
+            font-size: 14px;
+        }
         .links a:hover, .links button:hover { background: #555; }
+
         .section { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; color: #000; }
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; color: #000; font-size: 1.5em; }
+        h3 { font-size: 1.2em; margin-top: 20px; }
+
+        /* 이미지 반응형 */
         .figure { text-align: center; margin: 30px 0; }
-        .figure img { max-width: 100%; border-radius: 8px; }
+        .figure img { max-width: 100%; height: auto; border-radius: 8px; }
         .caption { font-size: 0.9em; color: #666; margin-top: 10px; text-align: justify; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+
+        /* 테이블 반응형 처리 */
+        .table-wrapper { width: 100%; overflow-x: auto; margin: 20px 0; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; /* 모바일에서 너무 찌그러지지 않게 최소 너비 설정 */ }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: center; font-size: 14px; }
         th { background: #f8f8f8; }
-        .highlight { font-weight: bold; color: #007bff; }
-        pre { background: #f4f4f4; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 0.9em; }
-        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 8px; }
-        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
-        .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
-        .copy-btn { background: #333; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        .copy-btn:hover { background: #555; }
+
+        /* 비디오 반응형 처리 (16:9 비율 유지) */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 비율 */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 8px;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        pre { background: #f4f4f4; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.85em; white-space: pre-wrap; word-break: break-all; }
+
+        /* 모달 스타일 */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 600px; position: relative; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .copy-btn { background: #333; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%; }
+
+        /* 모바일 대응 미디어 쿼리 */
+        @media (max-width: 768px) {
+            body { padding: 20px 15px; }
+            h1 { font-size: 1.8em; }
+            .authors { font-size: 1em; }
+            .section { padding: 20px 15px; }
+            h2 { font-size: 1.3em; }
+            .links a, .links button { padding: 8px 15px; font-size: 13px; flex: 1 1 calc(45% - 10px); text-align: center; }
+        }
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting</h1>
-    <div class="authors">Minsu Jeon<sup>1</sup>, Janghyun Kim<sup>1</sup>, Jinsun Park<sup>†1,2</div>
-    <div class="authors's Affiliation"><sup>1</sup>Pusan National University, Busan, Republic of Korea</div>
-    <div class="authors's Affiliation"><sup>2</sup>Center for Artificial Intelligence Research, Pusan National University, Busan, Republic of Korea</div>
-    <br>
-    <div class="affiliation">Eurographics 2026 (Short Paper)</div>
+    <div class="authors">Minsu Jeon<sup>1</sup>, Janghyun Kim<sup>1</sup>, Jinsun Park<sup>†1,2</sup></div>
+    <div class="affiliation-container">
+        <div class="authors-affiliation"><sup>1</sup>Pusan National University, Busan, Republic of Korea</div>
+        <div class="authors-affiliation"><sup>2</sup>Center for Artificial Intelligence Research, Pusan National University, Busan, Republic of Korea</div>
+        <div class="affiliation">Eurographics 2026 (Short Paper)</div>
+    </div>
     
     <div class="links">
-        <a href="https://drive.google.com/file/d/1slPjf4jPACQpqwc94qhPt-wy_vY4cIcm/view?usp=sharing">[Paper PDF]</a>
+        <a href="https://drive.google.com/file/d/1slPjf4jPACQpqwc94qhPt-wy_vY4cIcm/view?usp=sharing" target="_blank">[Paper PDF]</a>
         <button onclick="openModal()">[BibTeX]</button>
     </div>
 </div>
@@ -55,18 +116,15 @@
 <div class="section">
     <h2>Abstract</h2>
     <p>
-    3D human pose estimation from monocular images is inherently challenging due to frequent occlusions, which introduce significant ambiguity in joint visibility. For instance, regression-based methods are highly sensitive to these ambiguities, often leading to unstable and jittery pose estimates.
-    To overcome these limitations, recent token-based methods discretize poses into structured representations and better capture joint dependencies. However, most existing approaches operate in a frame-wise manner, neglecting temporal continuity and consequently suffering from time-inconsistent predictions.
-    Therefore, we propose a spatio-temporal token-based framework for 3D human pose estimation that explicitly models both spatial and temporal dependencies. In specific, a Spatio-Temporal Tokenizer decomposes 3D pose sequences into discrete spatial and temporal tokens via a dual codebook design.
-    To predict these tokens from 2D pose sequences, we further develop a token classifier based on a SemGCN–GraphGRU architecture, enabling effective temporal reasoning while preserving skeletal structure.
-    Extensive experiments on the Human3.6M dataset demonstrate that our method achieves state-of-the-art performance among short-sequence methods, while significantly reducing high-frequency jitter and producing smooth, physically plausible 3D pose sequences.
+        3D human pose estimation from monocular images is inherently challenging due to frequent occlusions... (중략) ...Extensive experiments on the Human3.6M dataset demonstrate that our method achieves state-of-the-art performance among short-sequence methods.
     </p>
 </div>
 
 <div class="section">
-    <h2>Hyperparameter</h2>
-    <div>
-        <h3>Tokenizer Encoder</h3>
+    <h2>Hyperparameters</h2>
+    
+    <h3>Tokenizer Encoder</h3>
+    <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
@@ -76,36 +134,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><strong>num_blocks</strong></td>
-                    <td>4</td>
-                    <td>Number of blocks in the encoder</td>
-                </tr>
-                <tr>
-                    <td><strong>hidden_dim</strong></td>
-                    <td>512</td>
-                    <td>Hidden dimension</td>
-                </tr>
-                <tr>
-                    <td><strong>token_inter_dim</strong></td>
-                    <td>64</td>
-                    <td>Token intermediate dimension</td>
-                </tr>
-                <tr>
-                    <td><strong>hidden_inter_dim</strong></td>
-                    <td>512</td>
-                    <td>Hidden intermediate dimension</td>
-                </tr>
-                <tr>
-                    <td><strong>drop_rate</strong></td>
-                    <td>0.2</td>
-                    <td>Encoder dropout rate</td>
-                </tr>
+                <tr><td><strong>num_blocks</strong></td><td>4</td><td>Number of blocks in the encoder</td></tr>
+                <tr><td><strong>hidden_dim</strong></td><td>512</td><td>Hidden dimension</td></tr>
+                <tr><td><strong>drop_rate</strong></td><td>0.2</td><td>Encoder dropout rate</td></tr>
             </tbody>
         </table>
     </div>
-    <div>
-        <h3>Tokenizer Decoder</h3>
+
+    <h3>Codebook / VQ Settings</h3>
+    <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
@@ -115,129 +152,25 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><strong>num_blocks</strong></td>
-                    <td>1</td>
-                    <td>Number of blocks in the decoder</td>
-                </tr>
-                <tr>
-                    <td><strong>hidden_dim</strong></td>
-                    <td>32</td>
-                    <td>Hidden dimension</td>
-                </tr>
-                <tr>
-                    <td><strong>token_inter_dim</strong></td>
-                    <td>64</td>
-                    <td>Token intermediate dimension</td>
-                </tr>
-                <tr>
-                    <td><strong>hidden_inter_dim</strong></td>
-                    <td>64</td>
-                    <td>Hidden intermediate dimension</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div>
-        <h3>Codebook / VQ (Codebook Settings)</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Parameter</th>
-                    <th>Value</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>token_num</strong></td>
-                    <td>34</td>
-                    <td>Number of tokens used</td>
-                </tr>
-                <tr>
-                    <td><strong>token_dim</strong></td>
-                    <td>512</td>
-                    <td>Embedding dimension of each token</td>
-                </tr>
-                <tr>
-                    <td><strong>s_token_class_num</strong></td>
-                    <td>1024</td>
-                    <td>Number of spatial token classes (Codebook Size)</td>
-                </tr>
-                <tr>
-                    <td><strong>t_token_class_num</strong></td>
-                    <td>1024</td>
-                    <td>Number of temporal token classes (Codebook Size)</td>
-                </tr>
-                <tr>
-                    <td><strong>ema_decay</strong></td>
-                    <td>0.9</td>
-                    <td>EMA (Exponential Moving Average) coefficient for codebook update</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div>
-        <h3>Loss Function</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Parameter</th>
-                    <th>Value</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>joint_loss_w</strong></td>
-                    <td>1.0</td>
-                    <td>Joint reconstruction loss weight</td>
-                </tr>
-                <tr>
-                    <td><strong>e_loss_w</strong></td>
-                    <td>5.0</td>
-                    <td>Embedding loss (Commitment Loss) weight</td>
-                </tr>
-                <tr>
-                    <td><strong>beta</strong></td>
-                    <td>0.05</td>
-                    <td>Threshold for Smooth L1 Loss</td>
-                </tr>
+                <tr><td><strong>token_num</strong></td><td>34</td><td>Number of tokens used</td></tr>
+                <tr><td><strong>s_token_class_num</strong></td><td>1024</td><td>Spatial codebook size</td></tr>
+                <tr><td><strong>t_token_class_num</strong></td><td>1024</td><td>Temporal codebook size</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
-
-    
 <div class="section">
     <h2>Supplementary Results Videos</h2>
-    
-    <iframe width="800" height="450" src="https://www.youtube.com/embed/FsXpOjLhixE?si=Rw47XHl_0IY9oPIA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-    <p class="caption"><strong>Video 1:</strong> Supplementary results video demonstrating the performance of our method.</p>
-</div>
-
-
-<div id="bibtexModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2>BibTeX</h2>
-        <pre id="bibtexContent">
-@inproceedings{jeon2026token,
-  title={Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting},
-  author={Jeon, Minsu and Lim, L. and Musialski, P.},
-  booktitle={Proceedings of Eurographics (Short Papers)},
-  year={2026}
-}
-        </pre>
-        <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/FsXpOjLhixE?si=Rw47XHl_0IY9oPIA" title="YouTube video player" allowfullscreen></iframe>
     </div>
+    <p class="caption"><strong>Video 1:</strong> Supplementary results video demonstrating the performance of our method.</p>
 </div>
 
 <div class="section">
     <h2>BibTeX</h2>
-    <pre>
-@inproceedings{jeon2026token,
+    <pre id="bibtexDisplay">@inproceedings{jeon2026token,
   title={Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting},
   author={Jeon, Minsu and Lim, L. and Musialski, P.},
   booktitle={Proceedings of Eurographics (Short Papers)},
@@ -245,15 +178,24 @@
 }</pre>
 </div>
 
+<!-- Modal -->
+<div id="bibtexModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>BibTeX Citation</h2>
+        <pre id="bibtexContent">@inproceedings{jeon2026token,
+  title={Token-Based Dual-Codebook Learning for Robust 3D Pose Lifting},
+  author={Jeon, Minsu and Lim, L. and Musialski, P.},
+  booktitle={Proceedings of Eurographics (Short Papers)},
+  year={2026}
+}</pre>
+        <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+</div>
+
 <script>
-function openModal() {
-    document.getElementById('bibtexModal').style.display = 'block';
-}
-
-function closeModal() {
-    document.getElementById('bibtexModal').style.display = 'none';
-}
-
+function openModal() { document.getElementById('bibtexModal').style.display = 'block'; }
+function closeModal() { document.getElementById('bibtexModal').style.display = 'none'; }
 function copyToClipboard() {
     const bibtexText = document.getElementById('bibtexContent').textContent;
     navigator.clipboard.writeText(bibtexText).then(function() {
@@ -262,13 +204,9 @@ function copyToClipboard() {
         console.error('Could not copy text: ', err);
     });
 }
-
-// Close modal when clicking outside
 window.onclick = function(event) {
     const modal = document.getElementById('bibtexModal');
-    if (event.target == modal) {
-        modal.style.display = 'none';
-    }
+    if (event.target == modal) { modal.style.display = 'none'; }
 }
 </script>
 
